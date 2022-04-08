@@ -1,6 +1,6 @@
 <?php
 
-require_once 'schema.php';
+require_once './core/schema.php';
 
 class CreateSubmissionSchema extends Schema
 {

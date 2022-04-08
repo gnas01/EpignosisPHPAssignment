@@ -1,6 +1,6 @@
 <?php
 
-require_once 'controller.php';
+require_once './core/controller.php';
 
 require_once './schemas/createUserSchema.php';
 require_once './schemas/updateUserSchema.php';

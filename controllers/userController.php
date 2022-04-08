@@ -1,6 +1,6 @@
 <?php
 
-require_once 'controller.php';
+require_once './core/controller.php';
 require_once './services/submissionService.php';
 require_once './models/submissionModel.php';
 require_once './schemas/createSubmissionSchema.php';
