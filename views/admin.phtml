@@ -1,0 +1,50 @@
+<head>
+    <title>Admin panel</title>
+</head>
+
+<body>
+    <button id="create-user-btn">Create user</button>
+
+    <?php
+    include_once './services/userService.php';
+
+    $users = getAllUsers();
+
+    echo "<div class='user-container'>";
+
+    foreach ($users as $user) 
+    {
+        $userType = $user->isAdmin ? 'admin' : 'employee';
+
+        echo "<div class='user'>";
+        echo $user->firstName . ' ' . $user->lastName . ' ' . $user->email . ' ' . $userType;
+        echo "<button onclick='editUser($user->id)'>Edit</button>";
+        echo "</div>";
+    }
+
+    echo "</div>";
+
+    ?>
+
+    <style>
+        #create-user-btn 
+        {
+            float: right;
+        }
+
+        .user-container 
+        {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .user
+        {
+            padding-top: 2rem;
+        }
+
+    </style>
+
+</body>

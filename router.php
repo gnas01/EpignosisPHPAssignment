@@ -53,6 +53,14 @@ class Router
             }
         }
 
+        /*if the callback function is in a form of a string
+        then we need to parse the string as "class + function name
+        and then manually instantiate the class and call the coresponding method"*/
+        if(is_string($callbackHandler))
+        {
+            $callbackHandler = $this->getGeneratedCallbackHandler($callbackHandler);
+        }
+
         if(!$callbackHandler)
         {
             if(!empty($this->notFoundHandler))
@@ -63,4 +71,21 @@ class Router
 
         call_user_func_array($callbackHandler, [array_merge($_GET, $_POST)]);
     }
+
+    public function getGeneratedCallbackHandler(string $callbackHandler)
+    {
+        $callbackFuntionParts = explode('::', $callbackHandler);
+        $className = $callbackFuntionParts[0];
+        $functionName = $callbackFuntionParts[1];
+
+        $class = new $className();
+
+        $callbackHandler = [$class, $functionName];
+
+        return $callbackHandler;
+    }
+    
+
 }
+
+?>

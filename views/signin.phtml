@@ -4,9 +4,23 @@
 
 <body>
     <h1>Login</h1>
-    <form action="">
-        <label for="username">Username</label>
-        <input type="text" name="username" placeholder="username">
+
+    <?php
+    if(isset($_SESSION['errors']))
+    {
+        echo "<h2>Errors: </h2>";
+        foreach($_SESSION['errors'] as $error)
+        {
+            echo "<p>$error</p>";
+        }
+
+        unset($_SESSION['errors']);
+    }
+    ?>
+
+    <form action="/userLogin" method="POST">
+        <label for="username">email</label>
+        <input type="text" name="email" placeholder="email">
         <label for="password">Password</label>
         <input type="password" name="password" placeholder="password">
         <input type="submit" value="login">
