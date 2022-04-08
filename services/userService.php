@@ -44,6 +44,8 @@ function getUser($id)
 {
     global $database;
 
+    $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
+
     $userModel = new UserModel();
 
     try
