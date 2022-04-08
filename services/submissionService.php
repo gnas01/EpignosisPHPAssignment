@@ -14,7 +14,7 @@ function getAllSubmissions($userID)
 
     try
     {
-        $stmt = $database->prepare("SELECT * FROM users_applications WHERE user_id = :user_id ORDER BY date_submitted DESC");
+        $stmt = $database->prepare("SELECT * FROM users_submissions WHERE user_id = :user_id ORDER BY date_submitted DESC");
         $stmt->execute([':user_id' => $userID]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -39,7 +39,7 @@ function getAllSubmissions($userID)
     return $submissions;
 }
 
-function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userID)
+function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userID, &$outID)
 {
     global $database;
 
@@ -47,14 +47,15 @@ function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userI
 
     try
     {
-        $stmt = $database->prepare("INSERT INTO users_applications (user_id, vacation_start, vacation_end, reason) VALUES (:user_id, :vacation_start, :vacation_end, :reason)");
+        $stmt = $database->prepare("INSERT INTO users_submissions (user_id, vacation_start, vacation_end, reason) VALUES (:user_id, :vacation_start, :vacation_end, :reason)");
         $stmt->execute([
             ':user_id' => $userID,
             ':vacation_start' => $createSubmissionSchema->startDate,
             ':vacation_end' => $createSubmissionSchema->endDate,
             ':reason' => $createSubmissionSchema->reason
-
         ]);
+        
+        $outID = $database->lastInsertId();
 
     }
     catch(PDOException $exception)
@@ -65,5 +66,6 @@ function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userI
 
     return true;
 }
+
 
 ?>

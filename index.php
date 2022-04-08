@@ -37,6 +37,8 @@ $router->get('/submitRequest', UserController::class . '::viewSubmitRequest', fn
 
 $router->post('/submitRequest', UserController::class . '::submitRequestHandler', fn () => protect());
 
+$router->get('/updateSubmission', AdminController::class . '::updateSubmissionHandler');
+
 
 $router->addNotFoundHandler(function() 
 {

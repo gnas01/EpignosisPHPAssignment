@@ -4,6 +4,7 @@ require_once './core/controller.php';
 require_once './services/submissionService.php';
 require_once './models/submissionModel.php';
 require_once './schemas/createSubmissionSchema.php';
+require_once './services/submissionTokenService.php';
 
 class UserController extends Controller
 {
@@ -36,13 +37,18 @@ class UserController extends Controller
             $this->redirect('/submitRequest');
             return;
         }
+
+        $outID = 0;
         
-        if(!createSubmission($createSubmissionSchema, SessionEditor::getAttribute(SessionEditor::USER)->id))
+        if(!createSubmission($createSubmissionSchema, SessionEditor::getAttribute(SessionEditor::USER)->id, $outID))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ["Something went wrong"]);
             $this->redirect('/submitRequest');
             return;
         }
+        
+        createSubmissionToken($outID, SessionEditor::getAttribute(SessionEditor::USER)->id);
+        
         
         SessionEditor::setAttribute(SessionEditor::ALERTS, ['Submission created']);
         $this->redirect('/home');

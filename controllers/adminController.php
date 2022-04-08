@@ -6,6 +6,7 @@ require_once './schemas/createUserSchema.php';
 require_once './schemas/updateUserSchema.php';
 
 require_once './services/userService.php';
+require_once './services/submissionTokenService.php';
 
 require_once './sessionEditor.php';
 
@@ -96,6 +97,26 @@ class AdminController extends Controller
         }
 
         $this->redirect('/updateUser?id=' . $_POST['id']);
+    }
+    
+    public function updateSubmissionHandler()
+    {
+        if(!isset($_GET['token']))
+        {   
+            echo "Token not provided";
+            return;
+        }
+        
+        $submissionToken = $_GET['token'];
+        
+        if(processSubmissionToken($submissionToken))
+        {
+            echo "Submission status updated";
+            return;
+        }
+        
+        echo "Something went wrong";
+        
     }
 }
 
