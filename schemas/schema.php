@@ -1,8 +1,11 @@
 <?php
 
+require_once 'customRule.php';
+
 abstract class Schema
 {
     private array $errors = [];
+    private array $customRules = [];
 
     public function loadData($data)
     {
@@ -15,6 +18,11 @@ abstract class Schema
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    protected function addCustomRule($callback, $message)
+    {
+        array_push($this->customRules, new CustomRule($message, $callback));
     }
 
     abstract public function rules(): array;
@@ -38,6 +46,20 @@ abstract class Schema
             if (isset($value['email']) && isset($this->{$key}) && !filter_var($this->{$key}, FILTER_VALIDATE_EMAIL))
             {
                 array_push($this->errors, "The field $key must be a valid email address");
+            }
+            if (isset($value['match']) && isset($this->{$key}) && $this->{$key} !== $this->{$value['match']})
+            {
+                array_push($this->errors, "The field $key must match the field {$value['match']}");
+            }
+        }
+
+
+        foreach ($this->customRules as $customRule)
+        {
+            if(!$customRule->getCallback())
+            {
+                array_push($this->errors, $customRule->getError());
+                return false;
             }
         }
         return empty($this->errors);

@@ -15,9 +15,11 @@ $router->get('/', function()
 });
 
 $router->get('/login', AuthController::class . '::viewLogin');
-$router->get('/admin', AdminController::class . '::viewAdmin');
-
 $router->post('/userLogin', AuthController::class . '::loginUserHandler');
+
+$router->get('/admin', AdminController::class . '::viewAdmin');
+$router->get('/createUser', AdminController::class . '::viewCreateUser');
+$router->post('/createUser', AdminController::class . '::createUserHandler');
 
 
 $router->addNotFoundHandler(function() 

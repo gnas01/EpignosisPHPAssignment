@@ -20,7 +20,7 @@ class AuthController extends Controller
 
         if(!$loginSchema->isValid())
         {
-            $_SESSION['errors'] = $loginSchema->getErrors();
+            SessionEditor::setAttribute(SessionEditor::ALERTS, $loginSchema->getErrors());
             $this->redirect('/login');
             return;
         }
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
         if($user_id === -1)
         {
-            $_SESSION['errors'] = ['Invalid email or password'];
+            SessionEditor::setAttribute(SessionEditor::ALERTS, ['Invalid email or password']);
             $this->redirect('/login');
             return;
         }

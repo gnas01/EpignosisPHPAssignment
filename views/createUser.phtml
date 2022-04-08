@@ -1,0 +1,36 @@
+<head>
+    <title>Create user</title>
+</head>
+
+<?php include_once "views/layouts/navBar.phtml"; ?>
+
+<body>
+
+    <h1>Create user</h1>
+
+    <?php
+    include_once "views/layouts/alerts.phtml";
+    ?>
+
+    <form action="/createUser" method="POST">
+        <label for="firstName">First name</label>
+        <input type="text" name="firstName" placeholder="first name">
+        <label for="lastName">Last name</label>
+        <input type="text" name="lastName" placeholder="last name">
+        <label for="email">Email</label>
+        <input type="text" name="email" placeholder="email">
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="password">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" name="confirmPassword" placeholder="password">
+
+        <label for="userType">User type</label>
+        <select name="userType">
+            <option value="0">Employee</option>
+            <option value="1">Admin</option>
+        </select>
+
+        <input type="submit" value="Create user">
+    </form>
+
+</body>

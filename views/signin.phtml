@@ -6,16 +6,7 @@
     <h1>Login</h1>
 
     <?php
-    if(isset($_SESSION['errors']))
-    {
-        echo "<h2>Errors: </h2>";
-        foreach($_SESSION['errors'] as $error)
-        {
-            echo "<p>$error</p>";
-        }
-
-        unset($_SESSION['errors']);
-    }
+    include_once "views/layouts/alerts.phtml";
     ?>
 
     <form action="/userLogin" method="POST">
