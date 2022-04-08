@@ -36,8 +36,8 @@ class AuthController extends Controller
 
         $userModel = getUser($user_id);
 
-        $_SESSION['user'] = $userModel;
-        $_SESSION['logged_in'] = true;
+        SessionEditor::setAttribute(SessionEditor::USER, $userModel);
+        SessionEditor::setAttribute(SessionEditor::AUTHENTICATED, true);
 
         if($userModel->isAdmin)
         {
@@ -47,6 +47,12 @@ class AuthController extends Controller
         {
             $this->redirect('/home');
         }
+    }
+    
+    public function logoutUserHandler()
+    {
+        SessionEditor::clear();
+        $this->redirect('/login');
     }
 }
 

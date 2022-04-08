@@ -4,6 +4,8 @@ class SessionEditor
 {
     public const ALERTS = "alerts";
     public const SELECTED_USER = "selected_user";
+    public const USER = "user";
+    public const AUTHENTICATED  = "authenticated";
 
     public static function getAttribute(string $attribute)
     {
@@ -33,6 +35,12 @@ class SessionEditor
     public static function removeAttribute(string $attribute)
     {
         unset($_SESSION[$attribute]);
+    }
+    
+    public static function clear()
+    {
+        session_unset();
+        session_destroy();
     }
 }
 

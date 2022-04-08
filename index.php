@@ -17,6 +17,8 @@ $router->get('/', function()
 $router->get('/login', AuthController::class . '::viewLogin');
 
 $router->post('/userLogin', AuthController::class . '::loginUserHandler');
+$router->get('/logout', AuthController::class . '::logoutUserHandler');
+
 
 $router->get('/admin', AdminController::class . '::viewAdmin');
 $router->get('/createUser', AdminController::class . '::viewCreateUser');
