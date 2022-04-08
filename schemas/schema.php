@@ -55,6 +55,10 @@ abstract class Schema
             {
                 array_push($this->errors, "The field $key must be an integer");
             }
+            if (isset($value['date']) && isset($this->{$key}) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->{$key}))
+            {
+                array_push($this->errors, "The field $key must be in the format YYYY-MM-DD");
+            }
         }
 
 

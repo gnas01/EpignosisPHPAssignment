@@ -1,7 +1,8 @@
 <?php
 
 require_once "./connection.php";
-require_once "./models/submission.php";
+require_once "./models/submissionModel.php";
+require_once "./schemas/createSubmissionSchema.php";
 
 function getAllSubmissions($userID)
 {
@@ -19,7 +20,7 @@ function getAllSubmissions($userID)
 
         foreach($rows as $row)
         {
-            $submission = new Submission();
+            $submission = new SubmissionModel();
             $submission->id = $row['id'];
             $submission->dateSubmitted = $row['date_submitted'];
             $submission->vacationStart = $row['vacation_start'];
@@ -36,6 +37,33 @@ function getAllSubmissions($userID)
     }
 
     return $submissions;
+}
+
+function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userID)
+{
+    global $database;
+
+    $userID = filter_var($userID, FILTER_SANITIZE_NUMBER_INT);
+
+    try
+    {
+        $stmt = $database->prepare("INSERT INTO users_applications (user_id, vacation_start, vacation_end, reason) VALUES (:user_id, :vacation_start, :vacation_end, :reason)");
+        $stmt->execute([
+            ':user_id' => $userID,
+            ':vacation_start' => $createSubmissionSchema->startDate,
+            ':vacation_end' => $createSubmissionSchema->endDate,
+            ':reason' => $createSubmissionSchema->reason
+
+        ]);
+
+    }
+    catch(PDOException $exception)
+    {
+        echo $exception->getMessage();
+        return false;
+    }
+
+    return true;
 }
 
 ?>

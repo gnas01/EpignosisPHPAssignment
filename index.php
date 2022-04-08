@@ -33,6 +33,9 @@ $router->post('/createUser', AdminController::class . '::createUserHandler', fn 
 $router->post('/updateUser', AdminController::class . '::updateUserHandler', fn () => protectAdmin());
 
 $router->get('/home', UserController::class . '::viewHome', fn () => protect());
+$router->get('/submitRequest', UserController::class . '::viewSubmitRequest', fn () => protect());
+
+$router->post('/submitRequest', UserController::class . '::submitRequestHandler', fn () => protect());
 
 
 $router->addNotFoundHandler(function() 

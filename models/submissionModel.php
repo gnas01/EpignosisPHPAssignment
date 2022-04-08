@@ -1,6 +1,6 @@
 <?php
 
-class Submission
+class SubmissionModel
 {
     public int $id;
     public string $dateSubmitted;
