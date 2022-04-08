@@ -13,7 +13,8 @@ class AdminController extends Controller
 {
     public function viewAdmin()
     {
-        $this->renderView('admin');
+        $users = getAllUsers();
+        $this->renderView('admin', ['users' => $users]);
     }
 
     public function viewUpdateUser()
