@@ -51,6 +51,10 @@ abstract class Schema
             {
                 array_push($this->errors, "The field $key must match the field {$value['match']}");
             }
+            if (isset($value['integer']) && isset($this->{$key}) && !is_numeric($this->{$key}))
+            {
+                array_push($this->errors, "The field $key must be an integer");
+            }
         }
 
 

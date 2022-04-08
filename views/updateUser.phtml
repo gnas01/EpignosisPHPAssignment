@@ -1,23 +1,23 @@
 <head>
-    <title>Create user</title>
+    <title>Update user</title>
 </head>
 
 <?php include_once "views/layouts/navBar.phtml"; ?>
 
 <body>
 
-    <h1>Create user</h1>
+    <h1>Update user</h1>
 
     <?php
     include_once "views/layouts/alerts.phtml";
     ?>
 
-    <?php
-    $requestURL = "/user";
-    $requestMethod = "POST";
-    $submitValue = "Create";
+    <?php 
 
+    $requestURL = "/updateUser";
+    $submitValue = "Update";
     include_once "views/layouts/userPropertiesForm.phtml"; 
+
     ?>
 
 </body>

@@ -27,7 +27,7 @@ class AuthController extends Controller
 
         $user_id = loginUser($loginSchema);
 
-        if($user_id === -1)
+        if($user_id === 0)
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['Invalid email or password']);
             $this->redirect('/login');

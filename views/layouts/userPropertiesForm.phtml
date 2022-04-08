@@ -1,0 +1,57 @@
+<?php
+    include_once "sessionEditor.php"; 
+    include_once "./models/userModel.php";
+
+    $selectedUser = SessionEditor::getAttribute(SessionEditor::SELECTED_USER);
+    
+    if($selectedUser === null)
+    {
+        /*if selectedUser is null, populate field with
+         default values which are empty strings*/
+        $selectedUser = new UserModel();
+    }
+?>
+
+
+<form action="<?php echo $requestURL?>" method="POST">
+    <label for="firstName" >First name</label>
+    <input type="text" value="<?php echo $selectedUser->firstName?>" name="firstName" placeholder="first name">
+    <label for="lastName">Last name</label>
+    <input type="text" value="<?php echo $selectedUser->lastName?>" name="lastName" placeholder="last name">
+    <label for="email">Email</label>
+    <input type="text" value="<?php echo $selectedUser->email?>" name="email" placeholder="email">
+
+    <?php
+
+    if($requestURL !== "/updateUser")
+    {
+
+        echo '
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="password">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" name="confirmPassword" placeholder="password">
+        ' ;
+    }
+    else
+    {
+        if(isset($_GET['id']))
+        {
+            $id = $_GET['id'];
+            echo '<input type="hidden" name="id" value="'.$id.'">';
+            
+        }
+    }
+
+    ?>
+
+    <label for="userType">User type</label>
+
+    
+    <select name="userType">
+        <option value="0" <?php if($selectedUser->isAdmin == 0) echo 'selected'?>>User</option>
+        <option value="1" <?php if($selectedUser->isAdmin == 1) echo 'selected'?>>Admin</option>
+    </select>
+
+    <input type="submit" value="<?php echo $submitValue;?>">
+</form>

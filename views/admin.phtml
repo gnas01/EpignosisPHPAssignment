@@ -18,13 +18,20 @@
 
         echo "<div class='user'>";
         echo $user->firstName . ' ' . $user->lastName . ' ' . $user->email . ' ' . $userType;
-        echo "<button onclick='editUser($user->id)'>Edit</button>";
+        echo "<button onclick='updateUser($user->id)'>Update</button>";
         echo "</div>";
     }
 
     echo "</div>";
 
     ?>
+    
+    <script>
+        function updateUser(id)
+        {
+            window.location.href = "/updateUser?id=" + id;
+        }
+    </script>
 
     <style>
         #create-user-btn 

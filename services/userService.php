@@ -4,6 +4,7 @@ require_once "./connection.php";
 require_once "./schemas/loginSchema.php";
 require_once "./models/userModel.php";
 require_once "./schemas/createUserSchema.php";
+require_once "./schemas/updateUserSchema.php";
 
 function loginUser(LoginSchema $loginSchema): int
 {
@@ -36,7 +37,7 @@ function loginUser(LoginSchema $loginSchema): int
         echo $exception->getMessage();
     }
 
-    return -1;
+    return 0;
 }
 
 function getUser($id)
@@ -123,7 +124,7 @@ function createUser(CreateUserSchema $createUserSchema)
         $stmt->execute([':email' => $email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($stmt->rowCount() > 0)
+        if($stmt->rowCount() !== 0)
         {
             return false;
         }
@@ -152,4 +153,57 @@ function createUser(CreateUserSchema $createUserSchema)
     return true;
 }
 
+function updateUser(UpdateUserSchema $updateUserSchema)
+{
+    global $database;
+
+    $firstName = filter_var($updateUserSchema->firstName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $lastName = filter_var($updateUserSchema->lastName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_var($updateUserSchema->email, FILTER_SANITIZE_EMAIL);
+    $userType = filter_var($updateUserSchema->userType, FILTER_SANITIZE_NUMBER_INT);
+    $userID = filter_var($updateUserSchema->id, FILTER_SANITIZE_NUMBER_INT);
+
+    try
+    {
+        $stmt = $database->prepare("UPDATE users SET email = :email WHERE id = :userId");
+        $stmt->execute([':email' => $email, ':userId' => $userID]);
+
+        $stmt = $database->prepare("UPDATE users_details SET first_name = :firstName, last_name = :lastName, is_admin = :isAdmin WHERE user_id = :userId");
+        $stmt->execute([':firstName' => $firstName, ':lastName' => $lastName, ':isAdmin' => $userType, ':userId' => $userID]);
+    }
+    catch(PDOException $exception)
+    {
+        echo $exception->getMessage();
+        return false;
+    }
+
+    return true;
+}
+
+function doesEmailExist(UpdateUserSchema $updateUserSchema)
+{
+    global $database;
+
+    $email = filter_var($updateUserSchema->email, FILTER_SANITIZE_EMAIL);
+    $userID = filter_var($updateUserSchema->id, FILTER_SANITIZE_NUMBER_INT);
+
+    try
+    {
+        $stmt = $database->prepare("SELECT id FROM users WHERE email = :email AND id != :userId LIMIT 1");
+        $stmt->execute([':email' => $email, ':userId' => $userID]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($stmt->rowCount() === 0)
+        {
+            return false;
+        }
+    }
+    catch(PDOException $exception)
+    {
+        echo $exception->getMessage();
+        return false;
+    }
+
+    return true;
+}
 ?>

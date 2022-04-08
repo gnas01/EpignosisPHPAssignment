@@ -3,6 +3,7 @@
 class SessionEditor
 {
     public const ALERTS = "alerts";
+    public const SELECTED_USER = "selected_user";
 
     public static function getAttribute(string $attribute)
     {

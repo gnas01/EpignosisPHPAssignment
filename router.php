@@ -18,7 +18,7 @@ class Router
     {
         $this->addHandler(self::METHOD_POST, $path, $handler);
     }
-
+    
     private function addHandler(string $method, string $path, $handler)
     {
         $this->handlers[$method . $path] = 
