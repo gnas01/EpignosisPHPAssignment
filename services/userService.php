@@ -15,16 +15,13 @@ function loginUser(LoginSchema $loginSchema): int
 
     try
     {
-        $stmt = $database->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
+        $stmt = $database->prepare("SELECT password, id FROM users WHERE email = :email LIMIT 1");
         $stmt->execute([':email' => $email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($stmt->rowCount() > 0)
         {
             $userId = $row['id'];
-            $stmt = $database->prepare("SELECT password FROM users_credentials WHERE id = :id LIMIT 1");
-            $stmt->execute([':id' => $userId]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if(password_verify($password, $row['password']))
             {
@@ -131,20 +128,13 @@ function createUser(CreateUserSchema $createUserSchema)
             return false;
         }
 
-        $stmt = $database->prepare("INSERT INTO users (email) VALUES (:email)");
-        $stmt->execute([':email' => $email]);
-
-        $stmt = $database->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute([':email' => $email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $userId = $row['id'];
+        $stmt = $database->prepare("INSERT INTO users (email, password) VALUES (:email, :password)");
+        $stmt->execute([':email' => $email, ':password' => password_hash($password, PASSWORD_DEFAULT)]);
+        
+        $userId = $database->lastInsertId();
 
         $stmt = $database->prepare("INSERT INTO users_details (user_id, first_name, last_name, is_admin) VALUES (:user_id, :firstName, :lastName, :isAdmin)");
         $stmt->execute([':user_id' => $userId, ':firstName' => $firstName, ':lastName' => $lastName, ':isAdmin' => $userType]);
-
-        $stmt = $database->prepare("INSERT INTO users_credentials (user_id, password) VALUES (:user_id, :password)");
-        $stmt->execute([':user_id' => $userId, ':password' => password_hash($password, PASSWORD_DEFAULT)]);
     }
     catch(PDOException $exception)
     {
