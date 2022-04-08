@@ -1,5 +1,6 @@
 <?php
 
+require_once "./models/userModel.php";
 session_start();
 
 require_once "router.php";

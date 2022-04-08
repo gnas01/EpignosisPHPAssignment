@@ -1,12 +1,12 @@
 <?php
 
 include_once "./sessionEditor.php";
-
+include_once "protect.php";
 
 
 function protectAdmin()
 {
-    include_once "./protect.php";
+    protect();
     if(!SessionEditor::getAttribute(SessionEditor::USER)->isAdmin)
     {
         header("Location: /login");

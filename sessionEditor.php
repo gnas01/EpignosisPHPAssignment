@@ -42,6 +42,15 @@ class SessionEditor
         session_unset();
         session_destroy();
     }
+   
+    public static function start()
+    {
+        /*including files that are needed for the
+         session to automatically serialize/deserialize*/
+
+        include_once "./models/userModel.php";
+        session_start();
+    }
 }
 
 ?>
