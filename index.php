@@ -7,6 +7,7 @@ require_once "router.php";
 
 require_once "./controllers/authController.php";
 require_once "./controllers/adminController.php";
+require_once "./controllers/userController.php";
 
 require_once "./middlewares/protect.php";
 require_once "./middlewares/protectAdmin.php";
@@ -30,6 +31,8 @@ $router->get('/updateUser', AdminController::class . '::viewUpdateUser', fn () =
 
 $router->post('/createUser', AdminController::class . '::createUserHandler', fn () => protectAdmin());
 $router->post('/updateUser', AdminController::class . '::updateUserHandler', fn () => protectAdmin());
+
+$router->get('/home', UserController::class . '::viewHome', fn () => protect());
 
 
 $router->addNotFoundHandler(function() 

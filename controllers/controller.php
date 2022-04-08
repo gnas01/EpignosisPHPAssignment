@@ -6,6 +6,7 @@ class Controller
     {
         extract($data);
         include_once "views/$view.phtml";
+
     }
 
     protected function redirect(string $path)

@@ -1,7 +1,22 @@
 <nav>
     <ul>
-        <li><a href="/admin">Home</a></li>
-        <li><a href="/createUser">Create user</a></li>
+        <?php
+
+            require_once './sessionEditor.php';
+
+            $isAdmin = SessionEditor::getAttribute(SessionEditor::USER)->isAdmin;
+
+            if($isAdmin)
+            {
+                echo '<li><a href="/admin">Admin</a></li>';
+                echo '<li><a href="/createUser">Create User</a></li>';
+            }
+            else
+            {
+                echo '<li><a href="/home">Home</a></li>';
+                echo '<li><a href="/submitRequest">Submit Request</a></li>';
+            }
+        ?>
         <li ><a id="logoutBtn" href="/logout">Logout</a></li>
     </ul>
 </nav>
@@ -9,7 +24,7 @@
 <style>
     nav {
         background-color: #f1f1f1;
-        padding: 10px;
+        padding: 1rem;
     }
 
     nav ul {

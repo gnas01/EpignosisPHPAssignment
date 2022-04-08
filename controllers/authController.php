@@ -10,6 +10,12 @@ class AuthController extends Controller
 {
     public function viewLogin()
     {
+        if(SessionEditor::getAttribute(SessionEditor::AUTHENTICATED))
+        {
+            $this->redirect('/home');
+            return;
+        }
+
         $this->renderView('signin');
     }
 
