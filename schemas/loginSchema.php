@@ -13,13 +13,13 @@ class LoginSchema extends Schema
             'email' => [
                 'required' => true,
                 'min' => 3,
-                'max' => 20,
+                'max' => 50,
                 'email' => true
             ],
             'password' => [
                 'required' => true,
                 'min' => 3,
-                'max' => 20
+                'max' => 50
             ]
         ];
     }

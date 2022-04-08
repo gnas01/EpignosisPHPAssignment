@@ -26,19 +26,19 @@ class UpdateUserSchema extends Schema
             [
                 'required' => true,
                 'min' => 3,
-                'max' => 20
+                'max' => 50
             ],
             'lastName' => 
             [
                 'required' => true,
                 'min' => 3,
-                'max' => 20
+                'max' => 50
             ],
             'email' => 
             [
                 'required' => true,
                 'min' => 3,
-                'max' => 20,
+                'max' => 254,
                 'email' => true
             ],
             'userType' => 
