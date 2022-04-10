@@ -5,6 +5,7 @@ require_once "./models/submissionModel.php";
 require_once "./models/submissionTokenModel.php";
 require_once "./models/userModel.php";
 require_once "./schemas/createSubmissionSchema.php";
+require_once "./services/mailService.php";
 
 function getAllSubmissions($userID)
 {
@@ -52,7 +53,13 @@ function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userI
         $submissionModel->save();
         
         //create a token for the submission
-        return createSubmissionToken($submissionModel);
+         if(!createSubmissionToken($submissionModel))
+         {
+             return false;
+         }
+         
+         vacationRequestMail($submissionModel);
+
     }
     catch(PDOException $exception)
     {
@@ -128,6 +135,8 @@ function processSubmissionToken($submissionToken)
         {
             return false;
         }
+        
+        submissionStatusUpdateMail($submissionModel);
         
         return true;
     }

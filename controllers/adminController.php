@@ -7,6 +7,7 @@ require_once './schemas/updateUserSchema.php';
 
 require_once './services/userService.php';
 require_once './services/submissionService.php';
+require_once './services/mailService.php';
 
 require_once './sessionEditor.php';
 
@@ -107,13 +108,13 @@ class AdminController extends Controller
         
         $submissionToken = $_GET['token'];
         
-        if(processSubmissionToken($submissionToken))
+        if(!processSubmissionToken($submissionToken))
         {
-            echo "Submission status updated";
+            echo "Something went wrong";
             return;
         }
         
-        echo "Something went wrong";
+        echo "Submission status updated";
         
     }
 }
