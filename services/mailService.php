@@ -30,8 +30,18 @@ function vacationRequestMail(SubmissionModel $submission)
 {
     try
     {
-        $userDetails = UserDetailsModel::findOne("user_id = $submission->user_id");
-        $submissionTokens = SubmissionTokenModel::findOne("submission_id = $submission->id");
+
+        $userDetails = UserDetailsModel::findOne
+        ([
+            'conditions' => 'user_id = ?',
+            'bind' => [$submission->user_id]
+        ]);
+
+        $submissionTokens = SubmissionTokenModel::findOne
+        ([
+            'conditions' => 'submission_id = ?',
+            'bind' => [$submission->id]
+        ]);
 
         $subject = "Vacation Request";
 
@@ -66,7 +76,12 @@ function submissionStatusUpdateMail(SubmissionModel $submission)
 {
     try
     {
-        $user = UserModel::findOne("id = $submission->user_id");
+        
+        $user = UserModel::findOne
+        ([
+            'conditions' => 'id = ?',
+            'bind' => [$submission->user_id]
+        ]);
         
         $email = $user->email;
 

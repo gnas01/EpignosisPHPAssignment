@@ -14,7 +14,12 @@ function loginUser(LoginSchema $loginSchema): ?UserDetailsModel
 
     try
     {
-        $userModel = UserModel::findOne("email = '$email'");
+
+        $userModel = UserModel::findOne
+        ([
+            'conditions' => 'email = ?',
+            'bind' => [$email]
+        ]);
 
         if(!$userModel)
         {
@@ -26,7 +31,11 @@ function loginUser(LoginSchema $loginSchema): ?UserDetailsModel
             return null;
         }
 
-        $userDetailsModel = UserDetailsModel::findOne("user_id = $userModel->id");
+        $userDetailsModel = UserDetailsModel::findOne
+        ([
+            'conditions' => 'user_id = ?',
+            'bind' => [$userModel->id]
+        ]);
 
         return $userDetailsModel;
     }
@@ -43,14 +52,23 @@ function getUser($id)
 {
     $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-    $userModel = UserModel::findOne("id = $id");
+    $userModel = UserModel::findOne
+    ([
+        'conditions' => 'id = ?',
+        'bind' => [$id]
+    ]);
     
     if(!$userModel)
     {
         return null;
     }
     
-    $userDetailsModel = UserDetailsModel::findOne("user_id = $userModel->id");
+    $userDetailsModel = UserDetailsModel::findOne
+    ([
+        'conditions' => 'user_id = ?',
+        'bind' => [$userModel->id]
+    ]);
+
     
     try
     {
@@ -134,11 +152,18 @@ function updateUser(UpdateUserSchema $updateUserSchema)
 
     try
     {
-        if(!UserModel::findOne("id = $id"))
+        $userModel = UserModel::findOne
+        ([
+            'conditions' => 'id = ?',
+            'bind' => [$id]
+        ]);
+
+        if(!$userModel)
+        {
             return false;
-        
-        UserModel::findOneAndUpdate("id = $id", ['email' => $email]);
-        UserDetailsModel::findOneAndUpdate("user_id = $id", ['first_name' => $firstName, 'last_name' => $lastName, 'is_admin' => $userType]);
+        }
+        UserModel::findOneAndUpdate((['conditions' => 'id = ?', 'bind' => [$id]]), ['email' => $email]);
+        UserDetailsModel::findOneAndUpdate((['conditions' => 'user_id = ?', 'bind' => [$id]]), ['first_name' => $firstName, 'last_name' => $lastName, 'is_admin' => $userType]);
     }
     catch(PDOException $exception)
     {
@@ -157,7 +182,11 @@ function doesEmailExist(UpdateUserSchema $updateUserSchema)
     
     try
     {
-        $userModel = UserModel::findOne("email = '$email' AND id != $userID");
+        $userModel = UserModel::findOne
+        ([
+            'conditions' => 'email = ? AND id != ?',
+            'bind' => [$email, $userID]
+        ]);
 
         if(!$userModel)
         {

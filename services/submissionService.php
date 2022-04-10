@@ -15,8 +15,11 @@ function getAllSubmissions($userID)
 
     try
     {
-        //in dec order
-        $submissionModels = SubmissionModel::find("user_id = $userID ORDER BY date_submitted DESC");
+        $submissionModels = SubmissionModel::find
+        ([
+            'conditions' => 'user_id = ? ORDER BY date_submitted DESC',
+            'bind' => [$userID]
+        ]);
     }
     catch(PDOException $exception)
     {
@@ -35,7 +38,13 @@ function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userI
     $reason = filter_var($createSubmissionSchema->reason, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
     //find if user exists
-    if(!UserModel::find($userID))
+    $userModel = UserModel::findOne
+    ([
+        'conditions' => 'id = ?',
+        'bind' => [$userID]
+    ]);
+
+    if(!$userModel)
     {
         return false;
     }
@@ -117,21 +126,38 @@ function processSubmissionToken($submissionToken)
     
     try
     {
-        $submissionTokenModel = SubmissionTokenModel::findOne("accept_token = '$submissionToken' OR reject_token = '$submissionToken'");
+        $submissionTokenModel = SubmissionTokenModel::findOne
+        ([
+            'conditions' => 'accept_token = ? OR reject_token = ?',
+            'bind' => [$submissionToken, $submissionToken]
+        ]);
 
         if(!$submissionTokenModel)
         {
             return false;
         }
         
-        $submissionModel = SubmissionModel::findOne("id = $submissionTokenModel->submission_id");
+        $submissionModel = SubmissionModel::findOne
+        ([
+            'conditions' => 'id = ?',
+            'bind' => [$submissionTokenModel->submission_id]
+        ]);
         
         if(!$submissionModel)
         {
             return false;
         }
         
-        if(!SubmissionModel::findOneAndUpdate("id = $submissionModel->id", ['status_type' => $submissionStatus]))
+        $submissionModel = SubmissionModel::findOneAndUpdate(
+        ([
+            'conditions' => 'id = ?',
+            'bind' => [$submissionTokenModel->submission_id],
+        ]),
+        [
+            'status_type' => $submissionStatus
+        ]);
+        
+        if(!$submissionModel)
         {
             return false;
         }

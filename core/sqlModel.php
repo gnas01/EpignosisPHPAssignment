@@ -39,7 +39,9 @@ abstract class SQLModel
         $tableName = static::getTableName();
         $attributes = get_class_vars(get_class(new static()));
 
-        $stmt = $database->prepare("SELECT * FROM $tableName WHERE ".$filter);
+        $stmt = $database->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
+
+        $stmt->execute($filter['bind']);
             
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -96,8 +98,10 @@ abstract class SQLModel
         $tableName = static::getTableName();
         $attributes = get_class_vars(get_class(new static()));
 
-        $stmt = $database->prepare("SELECT * FROM $tableName WHERE ".$filter);
-        $stmt->execute();
+        $stmt = $database->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
+
+        $stmt->execute($filter['bind']);
+
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $models = [];
@@ -133,9 +137,11 @@ abstract class SQLModel
         When using implode all the values will be satisfied 
         but the last one: fist_name = ?, last_name = ?, is_admin
         Hence, using ? we can simply concatenate it one last time in the string */
-        $stmt = $database->prepare("UPDATE $tableName SET ".implode(' = ?, ', $dataKeys)." = ? WHERE ".$filter);
+        $stmt = $database->prepare("UPDATE $tableName SET ".implode(' = ?, ', $dataKeys)." = ? WHERE ".$filter['conditions']);
+        
+        $bindedData = array_merge($dataValues, $filter['bind']);
 
-        $stmt->execute($dataValues);
+        $stmt->execute($bindedData);
 
         if($stmt->rowCount())
         {
