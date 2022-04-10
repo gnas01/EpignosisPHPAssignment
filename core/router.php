@@ -38,8 +38,8 @@ class Router
      *
      * @param string $method The type of request.
      * @param string $path The path of the route.
-     * @param [type] $handler The callback function that will be called when the route is matched.
-     * @param [type] $middleware optional middleware to be called before the callback.
+     * @param mixed $handler The callback function that will be called when the route is matched.
+     * @param mixed $middleware optional middleware to be called before the callback.
      * @return void
      */
     private function addHandler(string $method, string $path, $handler, $middleware)
@@ -56,7 +56,7 @@ class Router
     /**
      * Sets the callback function that will be called when the route is not found.
      *
-     * @param [type] $handler The callback function that will be called when the route is not found.
+     * @param mixed $handler The callback function that will be called when the route is not found.
      * @return void
      */
     public function addNotFoundHandler($handler)
@@ -91,7 +91,11 @@ class Router
             if($handler['middleware'])
             {
                 $middleware = $handler['middleware'];
-                $middleware();
+                // If the middleware returns false, then the route is not executed.
+                if(!$middleware())
+                {
+                    return;
+                }
             }
 
             $callbackHandler = $handler['handler'];

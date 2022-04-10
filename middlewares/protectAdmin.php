@@ -3,12 +3,10 @@
 namespace middleware;
 
 use core\SessionEditor;
-
-/**
- * Middleware used to restrict routes only to administrator users
- */
+use core\Middleware;
 
 include_once "./core/sessionEditor.php";
+include_once "./core/middleware.php";
 include_once "protect.php";
 
 
@@ -17,11 +15,20 @@ include_once "protect.php";
  * Redirects user to the login page if they are not an administrator and not an authenticated user
  */
 
-function protectAdmin()
+class ProtectAdmin extends Middleware
 {
-    protect();
-    if(!SessionEditor::getObject(SessionEditor::USER)->is_admin)
+    public static function execute(): bool
     {
-        header("Location: /login");
+        /*In case the user is not even authenticated,
+        * SessionEditor::USER will be uninitialized, so we check for that
+        */
+        if(!SessionEditor::getObject(SessionEditor::USER) ||!SessionEditor::getObject(SessionEditor::USER)->is_admin)
+        {
+            SessionEditor::setAttribute(SessionEditor::ALERTS, ["You must be logged in as an administrator to access this page."]);
+            header("Location: /login");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 use core\Router;
+use Middleware\Protect;
+use Middleware\ProtectAdmin;
 
 /**
  * Starting point of the application.
@@ -31,19 +33,19 @@ $router->post('/userLogin', AuthController::class . '::loginUserHandler');
 $router->get('/logout', AuthController::class . '::logoutUserHandler');
 
 
-$router->get('/admin', AdminController::class . '::viewAdmin', fn() => middleware\protectAdmin());
-$router->get('/createUser', AdminController::class . '::viewCreateUser', fn () => middleware\protectAdmin());
-$router->get('/updateUser', AdminController::class . '::viewUpdateUser', fn () => middleware\protectAdmin());
+$router->get('/admin', AdminController::class . '::viewAdmin', fn() => ProtectAdmin::execute());
+$router->get('/createUser', AdminController::class . '::viewCreateUser', fn () => ProtectAdmin::execute());
+$router->get('/updateUser', AdminController::class . '::viewUpdateUser', fn () => ProtectAdmin::execute());
 
-$router->post('/createUser', AdminController::class . '::createUserHandler', fn () => middleware\protectAdmin());
-$router->post('/updateUser', AdminController::class . '::updateUserHandler', fn () => middleware\protectAdmin());
+$router->post('/createUser', AdminController::class . '::createUserHandler', fn () => ProtectAdmin::execute());
+$router->post('/updateUser', AdminController::class . '::updateUserHandler', fn () => ProtectAdmin::execute());
 
-$router->get('/home', UserController::class . '::viewHome', fn () => middleware\protect());
-$router->get('/submitRequest', UserController::class . '::viewSubmitRequest', fn () => middleware\protect());
+$router->get('/home', UserController::class . '::viewHome', fn () => Protect::execute());
+$router->get('/submitRequest', UserController::class . '::viewSubmitRequest', fn () => Protect::execute());
 
-$router->post('/submitRequest', UserController::class . '::submitRequestHandler', fn () => middleware\protect());
+$router->post('/submitRequest', UserController::class . '::submitRequestHandler', fn () => Protect::execute());
 
-$router->get('/updateSubmission', AdminController::class . '::updateSubmissionHandler');
+$router->get('/updateSubmission', AdminController::class . '::updateSubmissionHandler', fn() => ProtectAdmin::execute());
 
 
 $router->addNotFoundHandler(function() 
