@@ -12,6 +12,7 @@ class SessionEditor
     public const SELECTED_USER = "selected_user";
     public const USER = "user";
     public const AUTHENTICATED  = "authenticated";
+    public const REDIRECTION = "redirection";
 
     /**
      * Returns unserialized object based on the key provided.

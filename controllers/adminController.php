@@ -4,6 +4,8 @@ namespace controllers;
 
 use core\Controller;
 use core\SessionEditor;
+use middleware\ProtectAdmin;
+use middleware\Protect;
 use services\UserService;
 use services\SubmissionTokenService;
 use schemas\CreateUserSchema;
@@ -18,6 +20,8 @@ require_once './services/userService.php';
 require_once './services/submissionService.php';
 require_once './services/submissionTokenService.php';
 
+require_once './middlewares/protectAdmin.php';
+require_once './middlewares/protect.php';
 require_once './core/sessionEditor.php';
 
 /**
@@ -128,12 +132,29 @@ class AdminController extends Controller
     }
     
     /**
-     * Handler updating a submission's status.
-     * Retrieves the token from the URL
-     * and then sends it for processing.
+     * Handler for updating a submission's status.
+     * If the user is not signed in it renders the login page.
+     * The current url is saved in the session for the redirect after login.
+     * When the user is redirected, the ProtectAdmin middlware is used here
+     * to ensure that only an administrator can access this page.
+     * then it retrieves the token from the URL
+     * and sends it for processing.
      */
     public function updateSubmissionHandler()
     {
+
+        if(!SessionEditor::getAttribute(SessionEditor::AUTHENTICATED))
+        {
+            SessionEditor::setAttribute(SessionEditor::ALERTS, ['You must sign in to continue']);
+            SessionEditor::setAttribute(SessionEditor::REDIRECTION, $_SERVER['REQUEST_URI']);
+
+            $this->renderView('signIn');
+            return;
+        }
+        
+        ProtectAdmin::execute();
+        
+        
         if(!isset($_GET['token']))
         {   
             echo "Token not provided";

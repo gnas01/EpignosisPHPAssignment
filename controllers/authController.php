@@ -45,7 +45,7 @@ class AuthController extends Controller
     {
         $loginSchema = new LoginSchema();
         $loginSchema->loadData($_POST);
-
+        
         if(!$loginSchema->isValid())
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, $loginSchema->getErrors());
@@ -64,6 +64,15 @@ class AuthController extends Controller
 
         SessionEditor::setObject(SessionEditor::USER, $userDetailsModel);
         SessionEditor::setAttribute(SessionEditor::AUTHENTICATED, true);
+        
+        if(SessionEditor::getAttribute(SessionEditor::REDIRECTION))
+        {
+            $redirection = SessionEditor::getAttribute(SessionEditor::REDIRECTION);
+            SessionEditor::removeAttribute(SessionEditor::REDIRECTION);
+            $this->redirect($redirection);
+            return;
+        }
+
         if($userDetailsModel->is_admin)
         {
             $this->redirect('/admin');
