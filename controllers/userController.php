@@ -3,20 +3,20 @@
 require_once './core/controller.php';
 require_once './services/submissionService.php';
 require_once './models/submissionModel.php';
+require_once './models/userDetailsModel.php';
 require_once './schemas/createSubmissionSchema.php';
-require_once './services/submissionTokenService.php';
 
 class UserController extends Controller
 {
     public function viewHome()
     {
-        if(SessionEditor::getAttribute(SessionEditor::USER)->isAdmin)
+        if(SessionEditor::getObject(SessionEditor::USER)->is_admin)
         {
             $this->redirect('/admin');
             return;
         }
 
-        $submissions = getAllSubmissions(SessionEditor::getAttribute(SessionEditor::USER)->id);
+        $submissions = getAllSubmissions(SessionEditor::getObject(SessionEditor::USER)->user_id);
         
         $this->renderView('home', ['submissions' => $submissions]);
     }
@@ -38,17 +38,12 @@ class UserController extends Controller
             return;
         }
 
-        $outID = 0;
-        
-        if(!createSubmission($createSubmissionSchema, SessionEditor::getAttribute(SessionEditor::USER)->id, $outID))
+        if(!createSubmission($createSubmissionSchema, SessionEditor::getObject(SessionEditor::USER)->user_id))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ["Something went wrong"]);
             $this->redirect('/submitRequest');
             return;
         }
-        
-        createSubmissionToken($outID, SessionEditor::getAttribute(SessionEditor::USER)->id);
-        
         
         SessionEditor::setAttribute(SessionEditor::ALERTS, ['Submission created']);
         $this->redirect('/home');

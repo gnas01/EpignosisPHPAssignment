@@ -2,24 +2,28 @@
     include_once "sessionEditor.php"; 
     include_once "./models/userModel.php";
 
-    $selectedUser = SessionEditor::getAttribute(SessionEditor::SELECTED_USER);
-    
-    if($selectedUser === null)
+
+    $selectedUser = ($data['selectedUser']) ?? null;
+
+    $userType = $selectedUser->is_admin ?? 0;
+
+    /* Dont render rest of the page if 
+    user id does not exist and we are in the
+    update user page*/
+    if(!$selectedUser && $requestURL === "/updateUser")
     {
-        /*if selectedUser is null, populate field with
-         default values which are empty strings*/
-        $selectedUser = new UserModel();
+        return;
     }
 ?>
 
 
 <form action="<?php echo $requestURL?>" method="POST">
     <label for="firstName" >First name</label>
-    <input type="text" value="<?php echo $selectedUser->firstName?>" name="firstName" placeholder="first name">
+    <input type="text" value="<?php echo $selectedUser->first_name ?? null ?>" name="firstName" placeholder="first name">
     <label for="lastName">Last name</label>
-    <input type="text" value="<?php echo $selectedUser->lastName?>" name="lastName" placeholder="last name">
+    <input type="text" value="<?php echo $selectedUser->last_name ?? null ?>" name="lastName" placeholder="last name">
     <label for="email">Email</label>
-    <input type="text" value="<?php echo $selectedUser->email?>" name="email" placeholder="email">
+    <input type="text" value="<?php echo $selectedUser->email ?? null ?>" name="email" placeholder="email">
 
     <?php
 
@@ -39,7 +43,6 @@
         {
             $id = $_GET['id'];
             echo '<input type="hidden" name="id" value="'.$id.'">';
-            
         }
     }
 
@@ -49,8 +52,8 @@
 
     
     <select name="userType">
-        <option value="0" <?php if($selectedUser->isAdmin == 0) echo 'selected'?>>User</option>
-        <option value="1" <?php if($selectedUser->isAdmin == 1) echo 'selected'?>>Admin</option>
+        <option value="0" <?php if($userType == 0) echo 'selected'?>>User</option>
+        <option value="1" <?php if($userType == 1) echo 'selected'?>>Admin</option>
     </select>
 
     <input type="submit" value="<?php echo $submitValue;?>">

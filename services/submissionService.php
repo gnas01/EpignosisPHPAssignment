@@ -2,61 +2,57 @@
 
 require_once "./connection.php";
 require_once "./models/submissionModel.php";
+require_once "./models/submissionTokenModel.php";
+require_once "./models/userModel.php";
 require_once "./schemas/createSubmissionSchema.php";
 
 function getAllSubmissions($userID)
 {
-    global $database;
-
     $userID = filter_var($userID, FILTER_SANITIZE_NUMBER_INT);
 
-    $submissions = [];
+    $submissionModels = [];
 
     try
     {
-        $stmt = $database->prepare("SELECT * FROM users_submissions WHERE user_id = :user_id ORDER BY date_submitted DESC");
-        $stmt->execute([':user_id' => $userID]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach($rows as $row)
-        {
-            $submission = new SubmissionModel();
-            $submission->id = $row['id'];
-            $submission->dateSubmitted = $row['date_submitted'];
-            $submission->vacationStart = $row['vacation_start'];
-            $submission->vacationEnd = $row['vacation_end'];
-            $submission->reason = $row['reason'];
-            $submission->status = $row['status_type'];
-
-            $submissions[] = $submission;
-        }
+        //in dec order
+        $submissionModels = SubmissionModel::find("user_id = $userID ORDER BY date_submitted DESC");
     }
     catch(PDOException $exception)
     {
         echo $exception->getMessage();
     }
 
-    return $submissions;
+    return $submissionModels;
 }
 
-function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userID, &$outID)
+function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userID)
 {
-    global $database;
-
     $userID = filter_var($userID, FILTER_SANITIZE_NUMBER_INT);
+    //sanitize 
+    $vacationStart = filter_var($createSubmissionSchema->startDate, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vacationEnd = filter_var($createSubmissionSchema->endDate, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $reason = filter_var($createSubmissionSchema->reason, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    
+    //find if user exists
+    if(!UserModel::find($userID))
+    {
+        return false;
+    }
 
     try
     {
-        $stmt = $database->prepare("INSERT INTO users_submissions (user_id, vacation_start, vacation_end, reason) VALUES (:user_id, :vacation_start, :vacation_end, :reason)");
-        $stmt->execute([
-            ':user_id' => $userID,
-            ':vacation_start' => $createSubmissionSchema->startDate,
-            ':vacation_end' => $createSubmissionSchema->endDate,
-            ':reason' => $createSubmissionSchema->reason
-        ]);
+        /* By not initalizing certain fields
+           we leave it up to the sql database
+           to set the default values for these fields */
+        $submissionModel = new SubmissionModel();
+        $submissionModel->user_id = $userID;
+        $submissionModel->vacation_start = $vacationStart;
+        $submissionModel->vacation_end = $vacationEnd;
+        $submissionModel->reason = $reason;
+        $submissionModel->save();
         
-        $outID = $database->lastInsertId();
-
+        //create a token for the submission
+        return createSubmissionToken($submissionModel);
     }
     catch(PDOException $exception)
     {
@@ -65,6 +61,82 @@ function createSubmission(CreateSubmissionSchema $createSubmissionSchema, $userI
     }
 
     return true;
+}
+
+function createSubmissionToken(SubmissionModel $submissionModel)
+{
+    $submissionID = filter_var($submissionModel->id, FILTER_SANITIZE_NUMBER_INT);
+    
+    $acceptToken = "a" . $submissionModel->user_id . md5(uniqid(rand(), true));
+    $rejectToken = "r". $submissionModel->user_id. md5(uniqid(rand(), true));
+    
+    try 
+    {
+        $submissionTokenModel = new SubmissionTokenModel();
+        $submissionTokenModel->submission_id = $submissionID;
+        $submissionTokenModel->accept_token = $acceptToken;
+        $submissionTokenModel->reject_token = $rejectToken;
+        $submissionTokenModel->save();
+        
+        return true;
+    }
+    catch (PDOException $exception) 
+    {
+        echo $exception->getMessage();
+        return false;
+    }
+    
+    return false;
+}
+
+function processSubmissionToken($submissionToken)
+{
+    $submissionToken = filter_var($submissionToken, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+    $submissionStatus = "";
+
+    if (substr($submissionToken, 0, 1) == 'a')
+    {
+        $submissionStatus = 'approved';
+    }
+    else if (substr($submissionToken, 0, 1) == 'r')
+    {
+        $submissionStatus = 'rejected';
+    }
+    else
+    {
+        return false;
+    }
+    
+    try
+    {
+        $submissionTokenModel = SubmissionTokenModel::findOne("accept_token = '$submissionToken' OR reject_token = '$submissionToken'");
+
+        if(!$submissionTokenModel)
+        {
+            return false;
+        }
+        
+        $submissionModel = SubmissionModel::findOne("id = $submissionTokenModel->submission_id");
+        
+        if(!$submissionModel)
+        {
+            return false;
+        }
+        
+        if(!SubmissionModel::findOneAndUpdate("id = $submissionModel->id", ['status_type' => $submissionStatus]))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    catch(PDOException $exception)
+    {
+        echo $exception->getMessage();
+        return false;
+    }
+
 }
 
 

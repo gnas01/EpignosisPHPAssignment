@@ -7,6 +7,21 @@ class SessionEditor
     public const USER = "user";
     public const AUTHENTICATED  = "authenticated";
 
+    public static function getObject(string $attribute)
+    {
+        if(isset($_SESSION[$attribute]))
+        {
+            return unserialize($_SESSION[$attribute]);
+        }
+
+        return null;
+    }
+    
+    public static function setObject(string $attribute, object $object)
+    {
+        $_SESSION[$attribute] = serialize($object);
+    }
+
     public static function getAttribute(string $attribute)
     {
         if(isset($_SESSION[$attribute]))
@@ -16,6 +31,7 @@ class SessionEditor
 
         return null;
     }
+    
 
     public static function setAttribute(string $attribute, $value)
     {
@@ -45,10 +61,6 @@ class SessionEditor
    
     public static function start()
     {
-        /*including files that are needed for the
-         session to automatically serialize/deserialize*/
-
-        include_once "./models/userModel.php";
         session_start();
     }
 }

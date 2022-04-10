@@ -25,11 +25,11 @@ $submissions = ($data['submissions']);
         {
 
             echo "<div class='submission'>";
-            echo "<p>Submitted: " . $submission->dateSubmitted . "</p>";
-            echo "<p>Dates requested: " . $submission->vacationStart . " until " . $submission->vacationEnd . "</p>";
+            echo "<p>Submitted: " . $submission->date_submitted . "</p>";
+            echo "<p>Dates requested: " . $submission->vacation_start . " until " . $submission->vacation_end . "</p>";
             echo "<p>Days requested: " . $submission->getDaysRequested() . "</p>";
             echo "<div class='reason'> <p>Reason: </p>" . $submission->reason . "</div>";
-            echo "<p>Status: " . $submission->status . "</p>";
+            echo "<p>Status: " . $submission->status_type . "</p>";
             echo "</div>";
         }
         ?>

@@ -7,7 +7,7 @@ include_once "protect.php";
 function protectAdmin()
 {
     protect();
-    if(!SessionEditor::getAttribute(SessionEditor::USER)->isAdmin)
+    if(!SessionEditor::getObject(SessionEditor::USER)->is_admin)
     {
         header("Location: /login");
     }

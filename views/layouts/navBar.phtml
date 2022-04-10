@@ -4,7 +4,7 @@
 
             require_once './sessionEditor.php';
 
-            $isAdmin = SessionEditor::getAttribute(SessionEditor::USER)->isAdmin;
+            $isAdmin = SessionEditor::getObject(SessionEditor::USER)->is_admin;
 
             if($isAdmin)
             {

@@ -12,7 +12,7 @@ class CreateSubmissionSchema extends Schema
     public function rules(): array
     {
         $this->addCustomRule($this->validateDates(), 'The start date must be before the end date');
-        $this->addCustomRule($this->validateDatePeriod(), 'The start date must not be in the past');
+        $this->addCustomRule($this->validateDatePeriod(), 'The start date must after today');
 
         return [
             'startDate' => [

@@ -4,9 +4,11 @@ require_once "./connection.php";
 
 abstract class SQLModel 
 {
+    public int $id = 0;
+
     abstract public static function getTableName();
 
-    public static function getPrimaryKey()
+    public static function getPrimaryKeyName()
     {
         return 'id';
     }
@@ -19,12 +21,15 @@ abstract class SQLModel
         $attributes = get_object_vars($this);
 
         //exlude id as it is autoincremented in the database
-        unset($attributes[$this->getPrimaryKey()]);
+        unset($attributes[$this->getPrimaryKeyName()]);
 
         //INSERT INTO users_details (id, user_id, first_name, last_name, is_admin) VALUES (:id, :user_id, :first_name, :last_name, :is_admin)
         $stmt = $database->prepare("INSERT INTO $tableName (" . implode(', ', array_keys($attributes)) . ") VALUES (:" . implode(', :', array_keys($attributes)) . ")");
         $bindedAttributes = array_combine(array_map(function($key) { return ":$key"; }, array_keys($attributes)), array_values($attributes));
         $stmt->execute($bindedAttributes);
+
+        //update the model's self with the new id
+        $this->id = $database->lastInsertId();
     }
 
     public static function findOne($filter)
@@ -64,6 +69,34 @@ abstract class SQLModel
         $attributes = get_class_vars(get_class(new static()));
 
         $stmt = $database->prepare("SELECT * FROM $tableName");
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $models = [];
+
+        foreach($rows as $row)
+        {
+            $model = new static();
+
+            foreach($attributes as $key => $value)
+            {
+                $model->$key = $row[$key];
+            }
+
+            $models[] = $model;
+        }
+
+        return $models;
+    }
+
+    public static function find($filter)
+    {
+        global $database;
+
+        $tableName = static::getTableName();
+        $attributes = get_class_vars(get_class(new static()));
+
+        $stmt = $database->prepare("SELECT * FROM $tableName WHERE ".$filter);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

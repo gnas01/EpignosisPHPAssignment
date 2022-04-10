@@ -6,7 +6,7 @@ require_once './schemas/createUserSchema.php';
 require_once './schemas/updateUserSchema.php';
 
 require_once './services/userService.php';
-require_once './services/submissionTokenService.php';
+require_once './services/submissionService.php';
 
 require_once './sessionEditor.php';
 
@@ -29,22 +29,20 @@ class AdminController extends Controller
 
         $selectedUser = getUser($selectedUserID);
 
-        if(!$selectedUser === null)
+        if(!$selectedUser)
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ["User not found"]);
         }
-        else
-        {
-            SessionEditor::setAttribute(SessionEditor::SELECTED_USER, $selectedUser);
-        }
 
-        $this->renderView('updateUser');
+        /*if selected user could not be found
+        updateUser view will treat the null value accordingly*/
+        $this->renderView('updateUser', ['selectedUser' => $selectedUser]);
     }
 
     public function viewCreateUser()
     {
         SessionEditor::removeAttribute(SessionEditor::SELECTED_USER);
-        $this->renderView('createUser');
+        $this->renderView('createUser', ['submitValue' => 'Create user']);
     }
 
     public function createUserHandler()

@@ -31,21 +31,18 @@ class AuthController extends Controller
             return;
         }
 
-        $user_id = loginUser($loginSchema);
+        $userDetailsModel = loginUser($loginSchema);
 
-        if($user_id === 0)
+        if(!$userDetailsModel)
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['Invalid email or password']);
             $this->redirect('/login');
             return;
         }
 
-        $userModel = getUser($user_id);
-
-        SessionEditor::setAttribute(SessionEditor::USER, $userModel);
+        SessionEditor::setObject(SessionEditor::USER, $userDetailsModel);
         SessionEditor::setAttribute(SessionEditor::AUTHENTICATED, true);
-
-        if($userModel->isAdmin)
+        if($userDetailsModel->is_admin)
         {
             $this->redirect('/admin');
         }

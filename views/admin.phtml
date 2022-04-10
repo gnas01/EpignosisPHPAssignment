@@ -13,10 +13,10 @@
 
     foreach ($users as $user) 
     {
-        $userType = $user->isAdmin ? 'admin' : 'employee';
+        $userType = $user->is_admin ? 'admin' : 'employee';
 
         echo "<div class='user'>";
-        echo $user->firstName . ' ' . $user->lastName . ' ' . $user->email . ' ' . $userType;
+        echo $user->first_name . ' ' . $user->last_name . ' ' . $user->email . ' ' . $userType;
         echo "<button onclick='updateUser($user->id)'>Update</button>";
         echo "</div>";
     }

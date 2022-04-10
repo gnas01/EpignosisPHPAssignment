@@ -3,73 +3,58 @@
 require_once "./connection.php";
 require_once "./schemas/loginSchema.php";
 require_once "./models/userModel.php";
+require_once "./models/userDetailsModel.php";
 require_once "./schemas/createUserSchema.php";
 require_once "./schemas/updateUserSchema.php";
 
-function loginUser(LoginSchema $loginSchema): int
+function loginUser(LoginSchema $loginSchema): ?UserDetailsModel
 {
-    global $database;
-
     $email = filter_var($loginSchema->email, FILTER_SANITIZE_EMAIL);
     $password = filter_var($loginSchema->password, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     try
     {
-        $stmt = $database->prepare("SELECT password, id FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute([':email' => $email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userModel = UserModel::findOne("email = '$email'");
 
-        if($stmt->rowCount() > 0)
+        if(!$userModel)
         {
-            $userId = $row['id'];
-
-            if(password_verify($password, $row['password']))
-            {
-                return $userId;
-            }
+            return null;
         }
+
+        if(!password_verify($password, $userModel->password))
+        {
+            return null;
+        }
+
+        $userDetailsModel = UserDetailsModel::findOne("user_id = $userModel->id");
+
+        return $userDetailsModel;
     }
-    catch(PDOException $exception)
+    catch(PDOException $e)
     {
-        echo $exception->getMessage();
+        echo $e->getMessage();
     }
 
-    return 0;
+    return null;
 }
+
 
 function getUser($id)
 {
-    global $database;
-
     $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-    $userModel = new UserModel();
-
+    $userModel = UserModel::findOne("id = $id");
+    
+    if(!$userModel)
+    {
+        return null;
+    }
+    
+    $userDetailsModel = UserDetailsModel::findOne("user_id = $userModel->id");
+    
     try
     {
-        $stmt = $database->prepare("SELECT * FROM users_details WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($stmt->rowCount() > 0)
-        {
-            $userModel->firstName = $row['first_name'];
-            $userModel->lastName = $row['last_name'];
-            $userModel->isAdmin = $row['is_admin'];
-        }
-
-
-        $stmt = $database->prepare("SELECT email FROM users WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($stmt->rowCount() > 0)
-        {
-            $userModel->id = $id;
-            $userModel->email = $row['email'];
-
-            return $userModel;
-        }
+        return composeUserModels($userModel, $userDetailsModel);
     }
     catch(PDOException $exception)
     {
@@ -81,25 +66,25 @@ function getUser($id)
 
 function getAllUsers()
 {
-    global $database;
-
-    $users = [];
-
     try
     {
-        $stmt = $database->prepare("SELECT * FROM users_details");
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $users = UserModel::findAll();
+        $userDetails = UserDetailsModel::findAll();
 
-        if($stmt->rowCount() > 0)
+        $mergedUserModels = [];
+        
+        /* Map user credentials with user details*/
+        foreach($users as $user)
         {
-            foreach($rows as $row)
+            foreach($userDetails as $userDetail)
             {
-                array_push($users, getUser($row['id']));
+                if($user->id == $userDetail->user_id)
+                {
+                    array_push($mergedUserModels, composeUserModels($user, $userDetail));
+                }
             }
-
-            return $users;
         }
+        return $mergedUserModels;
     }
     catch(PDOException $exception)
     {
@@ -109,8 +94,6 @@ function getAllUsers()
 
 function createUser(CreateUserSchema $createUserSchema)
 {
-    global $database;
-
     $firstName = filter_var($createUserSchema->firstName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $lastName = filter_var($createUserSchema->lastName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_var($createUserSchema->email, FILTER_SANITIZE_EMAIL);
@@ -119,49 +102,43 @@ function createUser(CreateUserSchema $createUserSchema)
 
     try
     {
-        $stmt = $database->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute([':email' => $email]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($stmt->rowCount() !== 0)
-        {
-            return false;
-        }
-
-        $stmt = $database->prepare("INSERT INTO users (email, password) VALUES (:email, :password)");
-        $stmt->execute([':email' => $email, ':password' => password_hash($password, PASSWORD_DEFAULT)]);
+        $userModel = new UserModel();
+        $userModel->email = $email;
+        $userModel->password = password_hash($password, PASSWORD_DEFAULT);
+        $userModel->save();
         
-        $userId = $database->lastInsertId();
-
-        $stmt = $database->prepare("INSERT INTO users_details (user_id, first_name, last_name, is_admin) VALUES (:user_id, :firstName, :lastName, :isAdmin)");
-        $stmt->execute([':user_id' => $userId, ':firstName' => $firstName, ':lastName' => $lastName, ':isAdmin' => $userType]);
+        $userDetailsModel = new UserDetailsModel();
+        $userDetailsModel->first_name = $firstName;
+        $userDetailsModel->last_name = $lastName;
+        $userDetailsModel->user_id = $userModel->id;
+        $userDetailsModel->is_admin = $userType;
+        $userDetailsModel->save();
+        
+        return true;
     }
     catch(PDOException $exception)
     {
         echo $exception->getMessage();
-        return false;
     }
 
-    return true;
+    return false;
 }
 
 function updateUser(UpdateUserSchema $updateUserSchema)
 {
-    global $database;
-
+    $id = filter_var($updateUserSchema->id, FILTER_SANITIZE_NUMBER_INT);
     $firstName = filter_var($updateUserSchema->firstName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $lastName = filter_var($updateUserSchema->lastName, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_var($updateUserSchema->email, FILTER_SANITIZE_EMAIL);
     $userType = filter_var($updateUserSchema->userType, FILTER_SANITIZE_NUMBER_INT);
-    $userID = filter_var($updateUserSchema->id, FILTER_SANITIZE_NUMBER_INT);
 
     try
     {
-        $stmt = $database->prepare("UPDATE users SET email = :email WHERE id = :userId");
-        $stmt->execute([':email' => $email, ':userId' => $userID]);
-
-        $stmt = $database->prepare("UPDATE users_details SET first_name = :firstName, last_name = :lastName, is_admin = :isAdmin WHERE user_id = :userId");
-        $stmt->execute([':firstName' => $firstName, ':lastName' => $lastName, ':isAdmin' => $userType, ':userId' => $userID]);
+        if(!UserModel::findOne("id = $id"))
+            return false;
+        
+        UserModel::findOneAndUpdate("id = $id", ['email' => $email]);
+        UserDetailsModel::findOneAndUpdate("user_id = $id", ['first_name' => $firstName, 'last_name' => $lastName, 'is_admin' => $userType]);
     }
     catch(PDOException $exception)
     {
@@ -174,18 +151,15 @@ function updateUser(UpdateUserSchema $updateUserSchema)
 
 function doesEmailExist(UpdateUserSchema $updateUserSchema)
 {
-    global $database;
 
     $email = filter_var($updateUserSchema->email, FILTER_SANITIZE_EMAIL);
     $userID = filter_var($updateUserSchema->id, FILTER_SANITIZE_NUMBER_INT);
-
+    
     try
     {
-        $stmt = $database->prepare("SELECT id FROM users WHERE email = :email AND id != :userId LIMIT 1");
-        $stmt->execute([':email' => $email, ':userId' => $userID]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $userModel = UserModel::findOne("email = '$email' AND id != $userID");
 
-        if($stmt->rowCount() === 0)
+        if(!$userModel)
         {
             return false;
         }
@@ -195,7 +169,23 @@ function doesEmailExist(UpdateUserSchema $updateUserSchema)
         echo $exception->getMessage();
         return false;
     }
-
+    
     return true;
+
 }
+
+function composeUserModels(UserModel $userModel, UserDetailsModel $userDetailsModel) : object
+{
+    //use UserModel's id 
+    $id = $userModel->id;
+
+    //combine the two objects to one
+    $mergedUserModel = (object) array_merge((array) $userModel, (array) $userDetailsModel);
+    
+    //add the id to the merged object
+    $mergedUserModel->id = $id;
+
+    return $mergedUserModel;
+}
+
 ?>

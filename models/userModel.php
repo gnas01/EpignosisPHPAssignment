@@ -1,14 +1,16 @@
 <?php
 
+include_once "./core/sqlModel.php";
 
-class UserModel 
+class UserModel extends SQLModel
 {
-    public int $id;
     public string $email = "";
     public string $password = "";
-    public string $firstName = "";
-    public string $lastName = "";
-    public bool $isAdmin = false;
+
+    public static function getTableName()
+    {
+        return 'users';
+    }
 }
 
 ?>
