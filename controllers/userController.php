@@ -24,7 +24,7 @@ class UserController extends Controller
             return;
         }
 
-        $submissions = getAllSubmissions(SessionEditor::getObject(SessionEditor::USER)->user_id);
+        $submissions = SubmissionService::getAll(SessionEditor::getObject(SessionEditor::USER)->user_id);
         
         $this->renderView('home', ['submissions' => $submissions]);
     }
@@ -56,7 +56,7 @@ class UserController extends Controller
             return;
         }
 
-        if(!createSubmission($createSubmissionSchema, SessionEditor::getObject(SessionEditor::USER)->user_id))
+        if(!SubmissionService::create($createSubmissionSchema, SessionEditor::getObject(SessionEditor::USER)->user_id))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ["Something went wrong"]);
             $this->redirect('/submitRequest');

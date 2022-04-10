@@ -46,7 +46,7 @@ class AuthController extends Controller
             return;
         }
 
-        $userDetailsModel = loginUser($loginSchema);
+        $userDetailsModel = UserService::login($loginSchema);
 
         if(!$userDetailsModel)
         {

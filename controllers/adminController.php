@@ -7,7 +7,7 @@ require_once './schemas/updateUserSchema.php';
 
 require_once './services/userService.php';
 require_once './services/submissionService.php';
-require_once './services/mailService.php';
+require_once './services/submissionTokenService.php';
 
 require_once './sessionEditor.php';
 
@@ -21,7 +21,7 @@ class AdminController extends Controller
      */
     public function viewAdmin()
     {
-        $users = getAllUsers();
+        $users = UserService::getAll();
         $this->renderView('admin', ['users' => $users]);
     }
 
@@ -37,7 +37,7 @@ class AdminController extends Controller
             $selectedUserID = $_GET['id'];
         }
 
-        $selectedUser = getUser($selectedUserID);
+        $selectedUser = UserService::get($selectedUserID);
 
         if(!$selectedUser)
         {
@@ -75,7 +75,7 @@ class AdminController extends Controller
             return;
         }
 
-        if(!createUser($createUserSchema))
+        if(!UserService::create($createUserSchema))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['User already exists']);
             $this->redirect('/createUser');
@@ -98,15 +98,15 @@ class AdminController extends Controller
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, $updateUserSchema->getErrors());
         }
-        else if(!getUser($updateUserSchema->id))
+        else if(!UserService::get($updateUserSchema->id))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['User does not exist']);
         }
-        else if(doesEmailExist($updateUserSchema))
+        else if(UserService::doesEmailExist($updateUserSchema))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['User already exists']);
         }
-        else if(!updateUser($updateUserSchema))
+        else if(!UserService::update($updateUserSchema))
         {
             SessionEditor::setAttribute(SessionEditor::ALERTS, ['Something went wrong']);
         }
@@ -120,6 +120,8 @@ class AdminController extends Controller
     
     /**
      * Handler updating a submission's status.
+     * Retrieves the token from the URL
+     * and then sends it for processing.
      */
     public function updateSubmissionHandler()
     {
@@ -131,7 +133,7 @@ class AdminController extends Controller
         
         $submissionToken = $_GET['token'];
         
-        if(!processSubmissionToken($submissionToken))
+        if(!SubmissionTokenService::process($submissionToken))
         {
             echo "Something went wrong";
             return;
