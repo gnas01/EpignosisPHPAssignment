@@ -1,5 +1,11 @@
 <?php
 
+namespace models;
+
+use DateTime;
+use core\SQLModel;
+
+
 include_once "./core/sqlModel.php";
 
 /**

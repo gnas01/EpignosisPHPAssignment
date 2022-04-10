@@ -1,5 +1,7 @@
 <?php
 
+namespace core;
+
 /** Class that provides necessary functions 
  * for creating and handling routes.
 */
@@ -124,7 +126,7 @@ class Router
     public function getGeneratedCallbackHandler(string $callbackHandler): callable
     {
         $callbackFuntionParts = explode('::', $callbackHandler);
-        $className = $callbackFuntionParts[0];
+        $className = "controllers\\" . $callbackFuntionParts[0];
         $functionName = $callbackFuntionParts[1];
 
         $class = new $className();

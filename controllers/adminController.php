@@ -1,5 +1,14 @@
 <?php
 
+namespace controllers;
+
+use core\Controller;
+use core\SessionEditor;
+use services\UserService;
+use services\SubmissionTokenService;
+use schemas\CreateUserSchema;
+use schemas\UpdateUserSchema;
+
 require_once './core/controller.php';
 
 require_once './schemas/createUserSchema.php';
@@ -9,7 +18,7 @@ require_once './services/userService.php';
 require_once './services/submissionService.php';
 require_once './services/submissionTokenService.php';
 
-require_once './sessionEditor.php';
+require_once './core/sessionEditor.php';
 
 /**
  * Controller for the actions of an administrator actor.

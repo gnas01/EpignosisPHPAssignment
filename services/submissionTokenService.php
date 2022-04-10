@@ -1,5 +1,11 @@
 <?php
 
+namespace services;
+
+use PDOException;
+use models\SubmissionModel;
+use models\SubmissionTokenModel;
+
 require_once "mailService.php";
 
 /**

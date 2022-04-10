@@ -1,10 +1,14 @@
 <?php
 
+namespace middleware;
+
+use core\SessionEditor;
+
 /**
  * Middleware used to restrict routes only to administrator users
  */
 
-include_once "./sessionEditor.php";
+include_once "./core/sessionEditor.php";
 include_once "protect.php";
 
 

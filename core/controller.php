@@ -1,5 +1,7 @@
 <?php
 
+namespace core;
+
 /**
  * Base class for all controllers. Responsible for
  * the way an actor interacts with the application.

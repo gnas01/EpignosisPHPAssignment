@@ -1,5 +1,10 @@
 <?php
 
+namespace schemas;
+
+use DateTime;
+use core\Schema;
+
 require_once './core/schema.php';
 
 /** Schema used to validate the data from

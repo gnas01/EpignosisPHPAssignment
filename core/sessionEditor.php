@@ -1,5 +1,7 @@
 <?php
 
+namespace core;
+
 /**
  * Helper class used for better handling
  * session variables. 

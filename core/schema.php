@@ -1,5 +1,7 @@
 <?php
 
+namespace core;
+
 require_once 'customRule.php';
 
 /**

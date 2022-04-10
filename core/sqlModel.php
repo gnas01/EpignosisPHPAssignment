@@ -1,5 +1,9 @@
 <?php
 
+namespace core;
+
+use PDO;
+
 require_once "./connection.php";
 
 /** Base class for all the models,

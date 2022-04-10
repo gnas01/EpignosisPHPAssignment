@@ -1,10 +1,14 @@
 <?php
 
+namespace middleware;
+
+use core\SessionEditor;
+
 /**
  * Middleware used to restrict routes only to authenticated users
  */
 
-include_once "./sessionEditor.php";
+include_once "./core/sessionEditor.php";
 
 /**
  * Middleware used to restrict routes only to authenticated users

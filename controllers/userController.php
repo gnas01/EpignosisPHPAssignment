@@ -1,5 +1,12 @@
 <?php
 
+namespace controllers;
+
+use core\Controller;
+use core\SessionEditor;
+use services\SubmissionService;
+use schemas\CreateSubmissionSchema;
+
 require_once './core/controller.php';
 require_once './services/submissionService.php';
 require_once './models/submissionModel.php';

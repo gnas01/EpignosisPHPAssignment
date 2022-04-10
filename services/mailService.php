@@ -1,5 +1,13 @@
 <?php
 
+namespace services;
+
+use PDOException;
+use models\SubmissionModel;
+use models\UserDetailsModel;
+use models\UserModel;
+use models\SubmissionTokenModel;
+
 require_once './services/userService.php';
 require_once './models/userDetailsModel.php';
 require_once './models/submissionModel.php';
@@ -87,7 +95,7 @@ class MailService
             self::sendToAllAdmins($subject, $message);
 
         }
-        catch(PDOException $exception)
+        catch (PDOException $exception)
         {
             echo $exception->getMessage();
         } 

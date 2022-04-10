@@ -2,7 +2,9 @@
     <ul>
         <?php
 
-            require_once './sessionEditor.php';
+            use core\SessionEditor;
+            
+            require_once './core/sessionEditor.php';
 
             $isAdmin = SessionEditor::getObject(SessionEditor::USER)->is_admin;
 

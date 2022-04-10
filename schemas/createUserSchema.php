@@ -1,5 +1,9 @@
 <?php
 
+namespace schemas;
+
+use core\Schema;
+
 require_once './core/schema.php';
 
 /**

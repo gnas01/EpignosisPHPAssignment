@@ -1,5 +1,9 @@
 <?php
 
+namespace models;
+
+use core\SQLModel;
+
 include_once "./core/sqlModel.php";
 
 /**

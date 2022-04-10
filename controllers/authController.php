@@ -1,5 +1,12 @@
 <?php
 
+namespace controllers;
+
+use core\Controller;
+use core\SessionEditor;
+use schemas\LoginSchema;
+use services\UserService;
+
 require_once "./core/controller.php";
 
 require_once "./services/userService.php";

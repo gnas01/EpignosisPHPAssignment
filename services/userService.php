@@ -1,5 +1,14 @@
 <?php
 
+namespace services;
+
+use PDOException;
+use schemas\LoginSchema;
+use schemas\CreateUserSchema;
+use schemas\UpdateUserSchema;
+use models\UserDetailsModel;
+use models\UserModel;
+
 require_once "./connection.php";
 require_once "./schemas/loginSchema.php";
 require_once "./models/userModel.php";
@@ -7,6 +16,9 @@ require_once "./models/userDetailsModel.php";
 require_once "./schemas/createUserSchema.php";
 require_once "./schemas/updateUserSchema.php";
 
+/**
+ * Service for user operations
+ */
 class UserService
 {
     /**
