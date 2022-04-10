@@ -2,13 +2,15 @@
 
 require_once './core/schema.php';
 
+/** Schema used to validate the data from
+ * the create submission form. */
 class CreateSubmissionSchema extends Schema
 {
     public string $startDate;
     public string $endDate;
     public string $reason;
 
-
+    
     public function rules(): array
     {
         $this->addCustomRule($this->validateDates(), 'The start date must be before the end date');
@@ -31,7 +33,10 @@ class CreateSubmissionSchema extends Schema
         ];
     }
 
-    private function validateDates()
+    /** Custom rule to validate if the
+     * start date is before the end date.
+     */
+    private function validateDates(): bool
     {
         $startDate = new DateTime($this->startDate);
         $endDate = new DateTime($this->endDate);
@@ -44,7 +49,10 @@ class CreateSubmissionSchema extends Schema
         return true;
     }
 
-    private function validateDatePeriod()
+    /** Custom rule to validate if the date period
+     * is after today.
+     */
+    private function validateDatePeriod(): bool
     {
         $startDate = new DateTime($this->startDate);
 

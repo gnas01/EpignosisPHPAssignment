@@ -2,6 +2,10 @@
 
 require_once './core/schema.php';
 
+/**
+ * Schema used to validate the data
+ * from the Login form.
+ */
 class LoginSchema extends Schema
 {
     public string $email;

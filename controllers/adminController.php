@@ -11,14 +11,23 @@ require_once './services/mailService.php';
 
 require_once './sessionEditor.php';
 
+/**
+ * Controller for the actions of an administrator actor.
+ */
 class AdminController extends Controller
 {
+    /**
+     * Displays the admin page with the list of users.
+     */
     public function viewAdmin()
     {
         $users = getAllUsers();
         $this->renderView('admin', ['users' => $users]);
     }
 
+    /**
+     * Displays the update user form with the user details.
+     */
     public function viewUpdateUser()
     {
         $selectedUserID = 0;
@@ -40,12 +49,20 @@ class AdminController extends Controller
         $this->renderView('updateUser', ['selectedUser' => $selectedUser]);
     }
 
+    /**
+     * Displays the create user form
+     * The create user form uses a common layout with the update user form,
+     * as a result the submit button is named differently.
+     */
     public function viewCreateUser()
     {
         SessionEditor::removeAttribute(SessionEditor::SELECTED_USER);
         $this->renderView('createUser', ['submitValue' => 'Create user']);
     }
 
+    /**
+     * Handler for creating a new user.
+     */
     public function createUserHandler()
     {
         $createUserSchema = new CreateUserSchema();
@@ -69,6 +86,9 @@ class AdminController extends Controller
         $this->redirect('/createUser');
     }
     
+    /**
+     * Handler for updating a user.
+     */
     public function updateUserHandler()
     {
         $updateUserSchema = new UpdateUserSchema();
@@ -98,6 +118,9 @@ class AdminController extends Controller
         $this->redirect('/updateUser?id=' . $_POST['id']);
     }
     
+    /**
+     * Handler updating a submission's status.
+     */
     public function updateSubmissionHandler()
     {
         if(!isset($_GET['token']))

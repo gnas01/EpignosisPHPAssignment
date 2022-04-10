@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Starting point of the application.
+ * This file is responsible for loading the routes
+ */
+
 require_once "./models/userModel.php";
 session_start();
 

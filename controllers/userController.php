@@ -6,8 +6,16 @@ require_once './models/submissionModel.php';
 require_once './models/userDetailsModel.php';
 require_once './schemas/createSubmissionSchema.php';
 
+/**
+ * Controller for the actions of an authenticated user actor
+ */
 class UserController extends Controller
 {
+    /**
+     * Displays the home page
+     * If the user is an administrator,
+     * the user is redirected to the admin page.
+     */
     public function viewHome()
     {
         if(SessionEditor::getObject(SessionEditor::USER)->is_admin)
@@ -21,11 +29,21 @@ class UserController extends Controller
         $this->renderView('home', ['submissions' => $submissions]);
     }
     
+    /**
+     * Displays the create submission form
+     */
     public function viewSubmitRequest()
     {
         $this->renderView('submitRequest');
     }
     
+    /**
+     * Creates a submission
+     * If the submission is successfully created,
+     * the user is redirected to the home page.
+     * Else it displays the create submission form, with
+     * the errors.
+     */
     public function submitRequestHandler()
     {
         $createSubmissionSchema = new CreateSubmissionSchema();

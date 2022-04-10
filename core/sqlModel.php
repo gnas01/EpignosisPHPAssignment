@@ -2,18 +2,30 @@
 
 require_once "./connection.php";
 
+/** Base class for all the models,
+ * contains the basic CRUD operations.
+ * When inherited, the variables of the child class
+ * will automatically be proccessed by the get_object_vars()
+ * function by passing the current instance as the argument.
+ */
 abstract class SQLModel 
 {
+    /** The primary key id value of the table */
     public int $id = 0;
 
-    abstract public static function getTableName();
+    /** The name of the table, meant to be overrided by child class */
+    abstract public static function getTableName() : string;
 
-    public static function getPrimaryKeyName()
+    /** Returns the name of the primary key 
+     * ALL MODELS MUST USE THE SAME PRIMARY KEY NAME
+    */
+    public static function getPrimaryKeyName(): string
     {
         return 'id';
     }
 
-    public function save()
+    /** Saves the model instance to the databse (insert operation) */
+    public function save(): void
     {
         global $database;
 
@@ -32,7 +44,15 @@ abstract class SQLModel
         $this->id = $database->lastInsertId();
     }
 
-    public static function findOne($filter)
+    /** Finds one record of the model based on the filters provided 
+     * @param array $filter The filters to be used in the query, 
+     * the array that will be passed must have 2 keys, "conditions" which will
+     * describe the operation in the form of a prepared statement and "bind" which
+     * will contain the values that will be binded accordingly.
+     * 
+     * @return SQLModel|null The model instance if found, null otherwise.
+    */
+    public static function findOne(array $filter) : ?SQLModel
     {
         global $database;
 
@@ -62,8 +82,11 @@ abstract class SQLModel
             return null;
         }
     }
-            
-    public static function findAll()
+    
+    /** Finds all the records of a model
+     * @return array An array of SQLModel instances
+     */
+    public static function findAll() : array
     {
         global $database;
 
@@ -91,7 +114,15 @@ abstract class SQLModel
         return $models;
     }
 
-    public static function find($filter)
+    /** Finds all the records of the model based on the filters provided 
+     * @param array $filter The filters to be used in the query, 
+     * the array that will be passed must have 2 keys, "conditions" which will
+     * describe the operation in the form of a prepared statement and "bind" which
+     * will contain the values that will be binded accordingly.
+     * 
+     * @return array An array of SQLModel instances.
+    */
+    public static function find(array $filter): array
     {
         global $database;
 
@@ -121,7 +152,18 @@ abstract class SQLModel
         return $models;
     }
 
-    public static function findOneAndUpdate($filter, $data)
+    /**
+     * Updates the model instance in the database based on the filters provided
+     * @param array $filter The filters to be used in the query,
+     * the array that will be passed must have 2 keys, "conditions" which will
+     * describe the operation in the form of a prepared statement and "bind" which
+     * will contain the values that will be binded accordingly.
+     * 
+     * @param array $data The data to be updated.
+     * 
+     * @return SQLModel|null The model instance that was updated, null otherwise.
+     */
+    public static function findOneAndUpdate(array $filter, array $data): ?SQLModel
     {
 
         $dataKeys = array_keys($data);

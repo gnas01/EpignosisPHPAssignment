@@ -6,8 +6,16 @@ require_once "./services/userService.php";
 require_once "./schemas/loginSchema.php";
 require_once "./models/userModel.php";
 
+/**
+ * Controller for authentication actions.
+ */
 class AuthController extends Controller
 {
+    /**
+     * Displays the login form
+     * If the user is already logged in,
+     * the user is redirected to the home page.
+     */
     public function viewLogin()
     {
         if(SessionEditor::getAttribute(SessionEditor::AUTHENTICATED))
@@ -19,6 +27,13 @@ class AuthController extends Controller
         $this->renderView('signin');
     }
 
+    /**
+     * Logs in a user
+     * If the user is already logged in,
+     * the user is redirected to the home page.
+     * Else it checks the user type (admin or not)
+     * and redirects to the appropriate page.
+     */
     public function loginUserHandler()
     {
         $loginSchema = new LoginSchema();
@@ -52,6 +67,10 @@ class AuthController extends Controller
         }
     }
     
+    /**
+     * Handler for logging out the user.
+     * Clears session and redirects to the login page.
+     */
     public function logoutUserHandler()
     {
         SessionEditor::clear();

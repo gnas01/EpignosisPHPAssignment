@@ -2,12 +2,22 @@
 
 require_once 'customRule.php';
 
+/**
+ *  Base class for schemas that are used to validate data.
+ */
 abstract class Schema
 {
+    /** Any validation errors will be stored here */
     private array $errors = [];
+
+    /** Custom rules in the forms of callback functions*/
     private array $customRules = [];
 
-    public function loadData($data)
+    /**
+     *  Loads data coming from a request into the schema.
+     *  @param array $data The data to be loaded.
+     */
+    public function loadData($data): void
     {
         foreach ($data as $key => $value)
         {
@@ -15,19 +25,35 @@ abstract class Schema
         }
     }
 
+    /** Returns any validation errors
+     * @return array The validation errors.
+     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
-    protected function addCustomRule($callback, $message)
+    /** Crafts a custom rule based on a bool callback function
+     * @param callable $callback The callback function that will be used to validate the data,
+     * must return true to pass validation.
+     * @param string $message The error message to be displayed if the rule fails.
+     */
+    protected function addCustomRule($callback, string $message): void
     {
         array_push($this->customRules, new CustomRule($message, $callback));
     }
 
+    /** Function that will contain all validation rules, meant to be
+     * overrided by the child class.
+     */
     abstract public function rules(): array;
 
-    public function isValid()
+    /**
+     *  Validates the data using the rules defined in the child class.
+     *  Contains several custom rules that can be used to validate data.
+     *  @return bool True if the data is valid, false otherwise.
+     */
+    public function isValid() : bool
     {
         foreach ($this->rules() as $key => $value)
         {
@@ -61,6 +87,10 @@ abstract class Schema
             }
         }
 
+        /**
+         * Iterates the customRules array, and if any of them fail,
+         * pushes the error message to the errors array.
+         */
 
         foreach ($this->customRules as $customRule)
         {

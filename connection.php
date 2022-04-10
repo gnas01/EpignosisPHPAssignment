@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * File containing the database connection.
+ */
+
 $dbHost = 'localhost';
 $dbName = 'phpepignosis';
 $dbUser = 'root';

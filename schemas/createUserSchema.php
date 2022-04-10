@@ -2,6 +2,10 @@
 
 require_once './core/schema.php';
 
+/**
+ * Schema used to validate the data
+ * from the user creation form.
+ */
 class CreateUserSchema extends Schema
 {
     public string $firstName;
@@ -46,7 +50,11 @@ class CreateUserSchema extends Schema
         ];
     }
 
-    private function validateUserType()
+    /**
+     * Custom rule to validate if the user type,
+     * selected in the drop down list is either "Employee" or "Admin".
+     */
+    private function validateUserType(): bool
     {
         if($this->userType != '0' && $this->userType != '1')
         {
