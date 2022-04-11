@@ -35,7 +35,7 @@ class AdminController extends Controller
     public function viewAdmin()
     {
         $users = UserService::getAll();
-        $this->renderView('admin', ['users' => $users]);
+        $this->renderView('admin', ['users' => $users, 'username' => SessionEditor::getObject(SessionEditor::USER)->last_name]);
     }
 
     /**

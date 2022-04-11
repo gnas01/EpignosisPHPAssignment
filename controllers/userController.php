@@ -33,7 +33,7 @@ class UserController extends Controller
 
         $submissions = SubmissionService::getAll(SessionEditor::getObject(SessionEditor::USER)->user_id);
         
-        $this->renderView('home', ['submissions' => $submissions]);
+        $this->renderView('home', ['submissions' => $submissions, 'username' => SessionEditor::getObject(SessionEditor::USER)->last_name]);
     }
     
     /**
