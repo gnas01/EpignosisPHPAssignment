@@ -74,7 +74,7 @@ abstract class SQLModel
         {
             $model = new static();
 
-            foreach($attributes as $key => $value)
+            foreach(array_keys($attributes) as $key)
             {
                 $model->$key = $row[$key];
             }
@@ -107,7 +107,7 @@ abstract class SQLModel
         {
             $model = new static();
 
-            foreach($attributes as $key => $value)
+            foreach(array_keys($attributes) as $key)
             {
                 $model->$key = $row[$key];
             }
@@ -145,7 +145,7 @@ abstract class SQLModel
         {
             $model = new static();
 
-            foreach($attributes as $key => $value)
+            foreach(array_keys($attributes) as $key)
             {
                 $model->$key = $row[$key];
             }
