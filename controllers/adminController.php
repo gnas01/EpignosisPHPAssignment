@@ -1,5 +1,6 @@
 <?php
 
+/**contains all controller components*/
 namespace controllers;
 
 use core\Controller;

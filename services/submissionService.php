@@ -7,7 +7,6 @@ use models\SubmissionModel;
 use models\UserModel;
 use schemas\CreateSubmissionSchema;
 
-require_once "./connection.php";
 require_once "./models/submissionModel.php";
 require_once "./models/submissionTokenModel.php";
 require_once "./models/userModel.php";

@@ -9,7 +9,6 @@ use schemas\UpdateUserSchema;
 use models\UserDetailsModel;
 use models\UserModel;
 
-require_once "./connection.php";
 require_once "./schemas/loginSchema.php";
 require_once "./models/userModel.php";
 require_once "./models/userDetailsModel.php";

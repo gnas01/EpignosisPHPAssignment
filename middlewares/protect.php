@@ -1,5 +1,6 @@
 <?php
 
+/**contains all middleware components*/
 namespace middleware;
 
 use core\SessionEditor;

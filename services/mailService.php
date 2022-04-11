@@ -1,5 +1,6 @@
 <?php
 
+/**contains all service components*/
 namespace services;
 
 use PDOException;

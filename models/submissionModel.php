@@ -1,5 +1,6 @@
 <?php
 
+/**contains all model components*/
 namespace models;
 
 use DateTime;

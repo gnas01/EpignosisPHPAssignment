@@ -1,10 +1,11 @@
 <?php
 
+/**contains all core components*/
 namespace core;
 
 use PDO;
 
-require_once "./connection.php";
+require_once "connection.php";
 
 /** Base class for all the models,
  * contains the basic CRUD operations.
@@ -31,8 +32,6 @@ abstract class SQLModel
     /** Saves the model instance to the databse (insert operation) */
     public function save(): void
     {
-        global $database;
-
         $tableName = $this->getTableName();
         $attributes = get_object_vars($this);
 
@@ -40,12 +39,12 @@ abstract class SQLModel
         unset($attributes[$this->getPrimaryKeyName()]);
 
         //INSERT INTO users_details (id, user_id, first_name, last_name, is_admin) VALUES (:id, :user_id, :first_name, :last_name, :is_admin)
-        $stmt = $database->prepare("INSERT INTO $tableName (" . implode(', ', array_keys($attributes)) . ") VALUES (:" . implode(', :', array_keys($attributes)) . ")");
+        $stmt = Database::getConnection()->prepare("INSERT INTO $tableName (" . implode(', ', array_keys($attributes)) . ") VALUES (:" . implode(', :', array_keys($attributes)) . ")");
         $bindedAttributes = array_combine(array_map(function($key) { return ":$key"; }, array_keys($attributes)), array_values($attributes));
         $stmt->execute($bindedAttributes);
 
         //update the model's self with the new id
-        $this->id = $database->lastInsertId();
+        $this->id = Database::getConnection()->lastInsertId();
     }
 
     /** Finds one record of the model based on the filters provided 
@@ -58,12 +57,10 @@ abstract class SQLModel
     */
     public static function findOne(array $filter) : ?SQLModel
     {
-        global $database;
-
         $tableName = static::getTableName();
         $attributes = get_class_vars(get_class(new static()));
 
-        $stmt = $database->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
+        $stmt = Database::getConnection()->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
 
         $stmt->execute($filter['bind']);
             
@@ -92,12 +89,10 @@ abstract class SQLModel
      */
     public static function findAll() : array
     {
-        global $database;
-
         $tableName = static::getTableName();
         $attributes = get_class_vars(get_class(new static()));
 
-        $stmt = $database->prepare("SELECT * FROM $tableName");
+        $stmt = Database::getConnection()->prepare("SELECT * FROM $tableName");
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -128,12 +123,10 @@ abstract class SQLModel
     */
     public static function find(array $filter): array
     {
-        global $database;
-
         $tableName = static::getTableName();
         $attributes = get_class_vars(get_class(new static()));
 
-        $stmt = $database->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
+        $stmt = Database::getConnection()->prepare("SELECT * FROM $tableName WHERE " . $filter['conditions']);
 
         $stmt->execute($filter['bind']);
 
@@ -173,7 +166,6 @@ abstract class SQLModel
         $dataKeys = array_keys($data);
         $dataValues = array_values($data);
 
-        global $database;
 
         $tableName = static::getTableName();
 
@@ -183,7 +175,7 @@ abstract class SQLModel
         When using implode all the values will be satisfied 
         but the last one: fist_name = ?, last_name = ?, is_admin
         Hence, using ? we can simply concatenate it one last time in the string */
-        $stmt = $database->prepare("UPDATE $tableName SET ".implode(' = ?, ', $dataKeys)." = ? WHERE ".$filter['conditions']);
+        $stmt = Database::getConnection()->prepare("UPDATE $tableName SET ".implode(' = ?, ', $dataKeys)." = ? WHERE ".$filter['conditions']);
         
         $bindedData = array_merge($dataValues, $filter['bind']);
 
