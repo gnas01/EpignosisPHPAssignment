@@ -152,7 +152,8 @@ class AdminController extends Controller
             return;
         }
         
-        ProtectAdmin::execute();
+        if(!ProtectAdmin::execute())
+            return;
         
         
         if(!isset($_GET['token']))
